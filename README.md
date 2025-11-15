@@ -211,6 +211,10 @@ $env:OPENAI_API_KEY = "SUA_CHAVE_AQUI"
 export OPENAI_API_KEY="SUA_CHAVE_AQUI"
 ```
 
+> Importante:
+> - Não commitar a chave no GitHub.
+> - Não colocar a chave em arquivos versionados.
+> - Em ambiente de produção, use o gerenciador de variáveis da plataforma de nuvem.
 
 ### 3.5. Rodar a aplicação
 
@@ -257,7 +261,6 @@ Essa URL é a que deve ser informada no formulário do case como
 ---
 
 
-
 ## 5. Estrutura de arquivos
 
 ```text
@@ -302,5 +305,3 @@ autou_email_ai/
 
 Se surgir qualquer dúvida sobre a execução, deploy ou ajustes na IA, basta consultar
 as seções acima ou adaptar os prompts e parâmetros no módulo `ai_classifier.py`.
-#   a u t o u - e m a i l - a i  
- 
