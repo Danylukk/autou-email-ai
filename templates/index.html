@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>AutoMail Insight · Classificador de E-mails com IA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="bg-orbit"></div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="branding">
+        <div class="logo-orb">
+          <span class="logo-dot"></span>
+        </div>
+        <div>
+          <h1>AutoMail Insight</h1>
+          <p>Console inteligente para triagem de e-mails com IA, focado em operações financeiras.</p>
+        </div>
+      </div>
+      <div class="status-badge" id="status-badge">
+        <span class="pulse-dot"></span>
+        IA operacional
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    {% if erro %}
+      <div class="alert alert-error">
+        {{ erro }}
+      </div>
+    {% endif %}
+
+    <section class="hero">
+      <div class="hero-text">
+        <h2>Reduza o ruído. Priorize o que é <span class="highlight">Produtivo</span>.</h2>
+        <p class="hero-subtitle">
+          Cole um e-mail real ou faça upload de um .txt/.pdf. A IA identifica se ele é
+          <strong>Produtivo</strong> ou <strong>Improdutivo</strong> e gera uma resposta automática,
+          pronta para ser enviada.
+        </p>
+        <ul class="hero-bullets">
+          <li>⚡ Classificação imediata com IA</li>
+          <li>📂 Upload de arquivos .txt e .pdf</li>
+          <li>💬 Resposta sugerida em PT-BR</li>
+        </ul>
+      </div>
+      <div class="hero-widget">
+        <div class="widget-header">
+          <span class="widget-dot red"></span>
+          <span class="widget-dot yellow"></span>
+          <span class="widget-dot green"></span>
+          <span class="widget-title">Painel em tempo real</span>
+        </div>
+        <div class="widget-body">
+          <div class="metric">
+            <span class="metric-label">Produtivos hoje</span>
+            <span class="metric-value" id="metric-prod">37</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Improdutivos hoje</span>
+            <span class="metric-value" id="metric-improd">19</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Tempo médio de triagem</span>
+            <span class="metric-value">~ 1.2s</span>
+          </div>
+          <p class="metric-footnote">
+            * Métricas de demonstração para ilustrar a jornada do usuário no vídeo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <!-- Card 1 – Entrada -->
+      <section class="card card-input">
+        <h3>1. Entrada do e-mail 📨</h3>
+        <p class="card-subtitle">
+          Cole o conteúdo do e-mail ou faça upload de um arquivo. Clique em
+          <strong>Rodar IA</strong> para classificar e gerar a resposta.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data" class="email-form" id="email-form">
+          <label for="email_text">Texto do e-mail</label>
+          <textarea
+            id="email_text"
+            name="email_text"
+            rows="10"
+            placeholder="Cole aqui o conteúdo do e-mail recebido..."
+          >{{ texto_original or "" }}</textarea>
+
+          <div class="file-row">
+            <label for="email_file" class="file-label">
+              📎 Anexar .txt ou .pdf
+            </label>
+            <input type="file" id="email_file" name="email_file" />
+          </div>
+
+          <div class="tone-row">
+            <label>Tom da resposta</label>
+            <div class="tone-options">
+              <label class="tone-option">
+                <input type="radio" name="tone" value="padrao"
+                  {% if tone_selected == 'padrao' %}checked{% endif %}>
+                <span>Equilibrado</span>
+              </label>
+              <label class="tone-option">
+                <input type="radio" name="tone" value="formal"
+                  {% if tone_selected == 'formal' %}checked{% endif %}>
+                <span>Mais formal</span>
+              </label>
+              <label class="tone-option">
+                <input type="radio" name="tone" value="informal"
+                  {% if tone_selected == 'informal' %}checked{% endif %}>
+                <span>Mais próximo</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-primary" id="btn-submit">
+              <span class="btn-label">Rodar IA e classificar</span>
+              <span class="btn-spinner" id="btn-spinner"></span>
+            </button>
+            <button type="button" class="btn-ghost" id="btn-demo">
+              Preencher com exemplo
+            </button>
+          </div>
+
+          <p class="hint">
+            Use essa área no vídeo para mostrar um e-mail produtivo (pedido de suporte)
+            e depois um improdutivo (felicitações).
+          </p>
+          <p class="hint hint-warning">
+            ⚠️ Não insira dados reais de clientes (CPF, cartões, contas). Esta é apenas
+            uma demonstração; use textos fictícios.
+          </p>
+        </form>
+      </section>
+
+      <!-- Card 2 – Bastidores da IA -->
+      <section class="card card-status">
+        <h3>2. Como a IA decide ⚙️</h3>
+        <p>
+          O texto passa por um pré-processamento leve (normalização e limpeza) e é enviado
+          para um modelo da <strong>OpenAI (GPT)</strong>, que foi instruído a operar em um
+          contexto de <strong>grande empresa financeira</strong>.
+        </p>
+        <ul>
+          <li><strong>Produtivo</strong> → solicita status, abre chamado, relata problema.</li>
+          <li><strong>Improdutivo</strong> → felicitações, agradecimentos, mensagens sociais.</li>
+        </ul>
+        <p>
+          O modelo responde com um <strong>JSON estruturado</strong> contendo a categoria,
+          o nível de confiança, um motivo resumido da decisão e uma resposta automática
+          já pronta para o cliente, no tom definido pelo usuário.
+        </p>
+        <p class="hint">
+          Essa explicação é perfeita para a parte do vídeo em que você descreve a arquitetura
+          da solução e o uso de IA.
+        </p>
+      </section>
+
+      <!-- Card 3 – Resultado -->
+      <section class="card card-output">
+        <h3>3. Resultado da classificação ✅</h3>
+
+        {% if resultado %}
+          <div class="pill {% if resultado.low_confidence %}pill-warning{% else %}pill-active{% endif %}">
+            <span class="pill-dot"></span>
+            Categoria: <strong>{{ resultado.categoria }}</strong>
+            <span class="pill-sep">·</span>
+            Confiança: <strong>{{ resultado.confianca }}</strong>
+          </div>
+
+          {% if resultado.low_confidence %}
+            <p class="warning-text">
+              🔎 Confiança baixa: recomendamos revisão humana antes de enviar esta resposta ao cliente.
+            </p>
+          {% endif %}
+
+          <h4>Por que a IA decidiu isso? 🔍</h4>
+          <p class="motivo-text">
+            {{ resultado.motivo }}
+          </p>
+
+          <h4>Resposta sugerida 💬</h4>
+          <textarea
+            readonly
+            class="output-text"
+            rows="10"
+          >{{ resultado.resposta }}</textarea>
+
+          <button type="button" class="btn-secondary" id="btn-copy">
+            Copiar resposta
+          </button>
+
+          <p class="hint">
+            Você pode ajustar essa mensagem antes de enviar ao cliente no e-mail real.
+          </p>
+        {% else %}
+          <div class="empty-state">
+            <p class="placeholder">
+              Envie um e-mail para ver aqui a categoria (Produtivo/Improdutivo),
+              o motivo da decisão da IA e uma resposta automática sugerida.
+            </p>
+            <div class="empty-ghost">
+              <div class="ghost-face"></div>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Case prático AutoU · Protótipo desenvolvido para demonstrar triagem de e-mails com IA.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
